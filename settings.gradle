@@ -1,0 +1,13 @@
+rootProject.name = 'backend'
+
+include 'user-service'
+include 'tx-service'
+include 'land-service'
+include 'analysis-service'
+include 'chat-service'
+include 'service-discovery'
+include 'api-gateway'
+include 'config-server'
+include 'secret-service'
+
+
