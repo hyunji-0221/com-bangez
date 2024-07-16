@@ -1,69 +1,7 @@
 spring:
-  main:
-    allow-bean-definition-overriding: true
   application:
-    name: land
+    name: land-service
   profiles:
-    active: service
+    active: local
   config:
-    import: "optional:configserver:http://localhost:8888"
-  data:
-    mongodb:
-      uri: mongodb://root:root@175.106.97.107:27017/mongo_db?authSource=admin&retryWrites=true&w=majority
-  sql:
-    init:
-      mode: always
-      encoding: UTF-8
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        type: trace
-jwt:
-  secret: kjhjmtkjhjmtkjhjmtkjhjmtkjhjmtkjhjmtkjhjmtkjhjmtkjhjmt
-  expiration:
-    access: 600000
-    refresh: 1200000
-
-server:
-  port: 8083
-
-eureka:
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-
-
-
-#eureka:
-#  client:
-#    # 유레카 서버에 등록 true
-#    fetch-registry: true
-#    register-with-eureka: true
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka
-#  instance:
-#    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-
-# actuator 설정
-management:
-  endpoints:
-    web:
-      exposure:
-        include: refresh
-  endpoint:
-    shutdown:
-      enabled: true
-
-# config 서버는 기본적으로 8888번 포트를 사용
-# 그 외에 설정 파일이 있는 위치와 디렉토리 매칭
-# uri: 설정파일이 있는 깃 주소
-# default-label: 깃 주소의 브랜치 이름
-# search-paths: 설정 파일들을 찾을 경로
-
-encrypt:
-  key: my-secret
+    import: optional:configserver:http://localhost:8888
