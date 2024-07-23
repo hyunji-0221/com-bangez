@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 
 //@RequestMapping("/chat")
-@CrossOrigin(originPatterns = "*", allowedHeaders = "*", allowCredentials = "true")
+//@CrossOrigin(originPatterns = "*", allowedHeaders = "*", allowCredentials = "true")
 public class ChatController {
 
     private final ChatServiceImpl chatServiceImpl;

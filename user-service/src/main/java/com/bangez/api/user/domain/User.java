@@ -3,13 +3,15 @@ package com.bangez.api.user.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @ToString
 @Entity(name = "User")
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

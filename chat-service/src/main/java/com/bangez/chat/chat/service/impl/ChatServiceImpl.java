@@ -38,8 +38,18 @@ public class ChatServiceImpl implements ChatService {
                     .subscribe();
             return chatSink;
         });
+
+        Flux<ServerSentEvent<ChatModel>> heartbeatFlux = Flux.interval(Duration.ofSeconds(30))
+                .map(tick -> ServerSentEvent.<ChatModel>builder()
+                        .event("heartbeat")
+                        .data(new ChatModel()) // 빈 ChatModel을 데이터로 보냄
+                        .build());
+
+        Flux<ServerSentEvent<ChatModel>> chatFlux = sink.asFlux()
+                .mergeWith(heartbeatFlux);
+
         log.info("Existing sink for roomId : {}", roomId);
-        return sink.asFlux().doOnCancel(() -> handleCancel(roomId));
+        return chatFlux.doOnCancel(() -> handleCancel(roomId));
     }
 
     @Override
