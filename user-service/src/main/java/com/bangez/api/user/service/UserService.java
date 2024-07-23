@@ -2,8 +2,8 @@ package com.bangez.api.user.service;
 
 
 import com.bangez.api.common.MessengerVO;
-import com.bangez.api.user.model.User;
-import com.bangez.api.user.model.UserDTO;
+import com.bangez.api.user.domain.User;
+import com.bangez.api.user.domain.UserDTO;
 
 public interface UserService {
 

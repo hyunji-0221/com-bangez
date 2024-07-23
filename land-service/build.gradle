@@ -82,6 +82,9 @@ dependencies {
     // JUnit
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    //Config (추가해야 8080 에러가 안남)
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
     // Test
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

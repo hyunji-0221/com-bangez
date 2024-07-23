@@ -22,8 +22,8 @@ public class RoomModel {
     @Id
     private String id;
     private String roomTitle;
+    private String senderId;
+    private String receiverId;
 
-    @CreatedDate
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDate;
 }

@@ -1,6 +1,6 @@
 package com.bangez.api.user.repository;
 
-import com.bangez.api.user.model.User;
+import com.bangez.api.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

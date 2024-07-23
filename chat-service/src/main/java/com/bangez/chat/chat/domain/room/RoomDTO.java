@@ -16,6 +16,8 @@ public class RoomDTO {
 
     private String id;
     private String roomTitle;
+    private String senderId;
+    private String receiverId;
 
     private String createDate;
 

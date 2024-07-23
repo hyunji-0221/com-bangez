@@ -3,19 +3,20 @@ package com.example.demo.land.controller;
 
 import com.example.demo.land.domain.LandDTO;
 import com.example.demo.land.service.LandService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/lands")
+//@RequestMapping("/lands")
+@RequiredArgsConstructor
 public class LandController {
 
-    @Autowired
-    private LandService landService;
+    private final LandService landService;
 
-    @GetMapping
+    @GetMapping("/all")
     public Flux<LandDTO> getAllLands() {
         return landService.getAllLands();
     }
@@ -25,7 +26,7 @@ public class LandController {
         return landService.getLandById(id);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public Mono<LandDTO> createLand(@RequestBody LandDTO landDTO) {
         return landService.createLand(landDTO);
     }

@@ -19,5 +19,5 @@ public class ChatDTO {
     private String message;
     private String timeStamp;
 
-    private String status;
+    private boolean read; //메시지 상태("안읽음", "읽음") 알림을 위한 필드
 }

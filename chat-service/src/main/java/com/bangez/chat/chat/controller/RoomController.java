@@ -2,25 +2,38 @@ package com.bangez.chat.chat.controller;
 
 
 import com.bangez.chat.chat.domain.room.RoomModel;
-import com.bangez.chat.chat.service.RoomService;
+import com.bangez.chat.chat.service.impl.RoomServiceImpl;
+import com.bangez.chat.common.Messenger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Log4j2
 @RestController
-@RequestMapping("/room")
+//@RequestMapping("/room")
 @RequiredArgsConstructor
-@CrossOrigin(originPatterns = "*", allowedHeaders = "*", allowCredentials = "true")
 public class RoomController {
-    private final RoomService roomService;
+    private final RoomServiceImpl roomServiceImpl;
 
-    @GetMapping(value = "/addRoomId/{userId}/{receiverId}")
-    public Mono<RoomModel> addRoomId(@RequestHeader("Authorization") String token,//기능 추가되면 userId 치우기
-                                     @PathVariable("userId") String userId,
-                                     @PathVariable("receiverId")String receiverId) {
-        log.info("userId: {}",userId);
-        return roomService.addRoomId(userId);
+    @GetMapping(value = "/open-room/{userId}/{receiverId}")
+    public Mono<RoomModel> test(@PathVariable("userId") String userId,
+                                @PathVariable("receiverId")String receiverId) {
+        log.info("RoomController userId / receiverId: {} / {}",userId,receiverId);
+        return roomServiceImpl.openRoom(userId,receiverId);
     }
+
+    @GetMapping(value = "/get-room-list/{userId}")
+    public Flux<RoomModel> getRoomList(@PathVariable("userId") String userId) {
+        log.info("userId: {}",userId);
+        return roomServiceImpl.getRoomList(userId);
+    }
+
+    @DeleteMapping(value = "/delete-room/{roomId}")
+    public Mono<Messenger> deleteRoom(@PathVariable("roomId") String roomId) {
+        log.info("roomId: {}",roomId);
+        return roomServiceImpl.deleteRoom(roomId);
+    }
+
 }

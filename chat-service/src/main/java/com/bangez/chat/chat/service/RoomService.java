@@ -1,29 +1,14 @@
 package com.bangez.chat.chat.service;
 
 import com.bangez.chat.chat.domain.room.RoomModel;
-import com.bangez.chat.chat.repository.RoomRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import com.bangez.chat.common.Messenger;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+public interface RoomService {
+    Mono<RoomModel> openRoom(String userId, String receiverId);
 
+    Flux<RoomModel> getRoomList(String userId);
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class RoomService {
-    LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-    private final RoomRepository roomRepository;
-    public Mono<RoomModel> addRoomId(String userId) {
-        return roomRepository.save(RoomModel.builder()
-                .roomTitle("test1")
-                .createDate(time)
-                .build());
-    }
+    Mono<Messenger> deleteRoom(String roomId);
 }

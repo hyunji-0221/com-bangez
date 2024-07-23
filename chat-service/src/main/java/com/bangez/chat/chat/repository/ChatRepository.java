@@ -9,4 +9,10 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface ChatRepository extends ReactiveMongoRepository<ChatModel,String> {
     Flux<ChatModel> findByChatRoomId(String chatRoomId);
+
+    Flux<ChatModel> findByReceiverIdAndReadFalse(String senderId);
+
+    Flux<ChatModel> findByChatRoomIdAndReceiverIdAndReadFalse(String roomId, String userId);
+
+
 }

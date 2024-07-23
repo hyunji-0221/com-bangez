@@ -56,6 +56,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
     implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.14'
 
+    //Config (추가해야 8080 에러가 안남)
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'io.projectreactor:reactor-test'

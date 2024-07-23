@@ -1,95 +1,84 @@
 package com.bangez.apigateway.filter;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+
+import com.bangez.apigateway.domain.vo.Role;
+import com.bangez.apigateway.service.provider.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Set;
 
 @Slf4j
 @Component
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config>{
-    // Environment env;
-    // public AuthorizationHeaderFilter(Environment env) {
-    //    super(Config.class);
-    //    this.env = env;
-    // }
-    @Value("${jwt.secret}")
-    private String secretValue;
-    public static class Config {
-        // Put configuration properties here
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public AuthorizationHeaderFilter(JwtTokenProvider jwtTokenProvider){
+        super(Config.class);
+        this.jwtTokenProvider = jwtTokenProvider;
     }
+
+    @Data
+    public static class Config {
+        private String headerName;
+        private String headerValue;
+        private List<Role> roles;
+    }
+
     @Override
     public GatewayFilter apply(Config config) {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-//            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-//                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
-//            } //key check
-            HttpHeaders headers = request.getHeaders();
-            Set<String> keys = headers.keySet();
-            log.info(">>>");
-            keys.stream().forEach(v -> {
-                log.info(v + "=" + request.getHeaders().get(v));
-            });
-            log.info("<<<");
-//            String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-//            String jwt = authorizationHeader.replace("Bearer", "");
+        return ((exchange, chain) -> {
+            log.info("Request URL: {}", exchange.getRequest().getURI());
+            if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
+                return onError(exchange, HttpStatus.UNAUTHORIZED, "No Authorization Header");
 
-            // Create a cookie object
-//            ServerHttpResponse response = exchange.getResponse();
-//            ResponseCookie c1 = ResponseCookie.from("my_token", "test1234").maxAge(60 * 60 * 24).build();
-//            response.addCookie(c1);
+            @SuppressWarnings("null")
+            String token = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 
-//            if (!isJwtValid(jwt)) {
-//                return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
-//            }
-            return chain.filter(exchange);
-        };
+            if(token == null)
+                return onError(exchange, HttpStatus.UNAUTHORIZED, "No Token or Invalid Token");
+
+            String jwt = jwtTokenProvider.removeBearer(token);
+
+            if(!jwtTokenProvider.isTokenValid(jwt, false))
+                return onError(exchange, HttpStatus.UNAUTHORIZED, "Invalid Token");
+
+            List<Role> roles = jwtTokenProvider.extractRoles(jwt).stream().map(i -> Role.valueOf(i)).toList();
+
+            for(var i : config.getRoles()){
+                if(roles.contains(i))
+                    return chain.filter(exchange);
+            }
+
+            return onError(exchange, HttpStatus.UNAUTHORIZED, "No Permission");
+        });
     }
-    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
-        log.error(err);
-        byte[] bytes = "The requested token is invalid.".getBytes(StandardCharsets.UTF_8);
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-        return response.writeWith(Flux.just(buffer));
-//        return response.setComplete();
-    }
-    private boolean isJwtValid(String jwt) {
-//        byte[] secretKeyBytes = Base64.getEncoder().encode(env.getProperty("token.secret").getBytes());
-        //SecretKey signingKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
-        boolean returnValue = true;
-        String subject = null;
-        try {
-            // JwtParser jwtParser = Jwts.parserBuilder()
-            //        .setSigningKey(signingKey)
-            //        .build();
-            // subject = jwtParser.parseClaimsJws(jwt).getBody().getSubject();
-        } catch (Exception ex) {
-            returnValue = false;
-        }
-        if (subject == null || subject.isEmpty()) {
-            returnValue = false;
-        }
-        return returnValue;
+
+    private Mono<Void> onError(ServerWebExchange exchange, HttpStatusCode httpStatusCode, String message){
+        log.error("Error Occured : {}, {}, {}", exchange.getRequest().getURI(), httpStatusCode, message);
+        exchange.getResponse().setStatusCode(httpStatusCode);
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(message.getBytes());
+        return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 }
