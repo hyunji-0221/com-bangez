@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Builder
 @Component
+@ToString
 public class UserDTO {
     private Long id;
     private String userName;
