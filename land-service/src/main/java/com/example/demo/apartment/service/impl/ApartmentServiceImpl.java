@@ -1,10 +1,8 @@
-package com.example.demo.apartment.service.impl;
-
+package com.example.demo.apartment.service;
 import com.example.demo.apartment.domain.ApartmentDTO;
 import com.example.demo.apartment.domain.ApartmentMapper;
 import com.example.demo.apartment.domain.ApartmentModel;
 import com.example.demo.apartment.repository.ApartmentRepository;
-import com.example.demo.apartment.service.ApartmentService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
